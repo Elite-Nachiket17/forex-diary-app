@@ -101,9 +101,14 @@ export default function Index() {
             {trades.length > 0 && (
               <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5">
                 <Download className="h-3.5 w-3.5" />
-                Export CSV
+                Export
               </Button>
             )}
+            <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} className="gap-1.5">
+              <Upload className="h-3.5 w-3.5" />
+              Import
+            </Button>
+            <input ref={fileInputRef} type="file" accept=".csv" className="hidden" onChange={handleImport} />
           </div>
         </header>
 
