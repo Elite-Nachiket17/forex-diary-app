@@ -1,15 +1,17 @@
 import { useState, useCallback } from "react";
-import { getTrades, calculateStats, getEquityCurve, getPairStats, getSessionStats, type Trade } from "@/lib/trades";
+import { getTrades, calculateStats, getEquityCurve, getPairStats, getSessionStats, exportTradesToCSV, type Trade } from "@/lib/trades";
 import { StatCard } from "@/components/StatCard";
 import { EquityChart } from "@/components/EquityChart";
 import { SessionChart } from "@/components/SessionChart";
 import { PairPerformance } from "@/components/PairPerformance";
 import { AddTradeForm } from "@/components/AddTradeForm";
 import { TradeHistory } from "@/components/TradeHistory";
+import { TradeCalendar } from "@/components/TradeCalendar";
 import { TiltAlert } from "@/components/TiltAlert";
-import { BarChart3, PlusCircle, LayoutDashboard } from "lucide-react";
+import { BarChart3, PlusCircle, LayoutDashboard, Calendar, Download } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
-type Tab = "dashboard" | "add-trade" | "analytics";
+type Tab = "dashboard" | "add-trade" | "analytics" | "calendar";
 
 export default function Index() {
   const [trades, setTrades] = useState<Trade[]>(getTrades());
@@ -25,10 +27,22 @@ export default function Index() {
     setActiveTab("dashboard");
   }, []);
 
+  const handleExport = () => {
+    const csv = exportTradesToCSV(trades);
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `fx-log-trades-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard className="h-4 w-4" /> },
     { id: "add-trade", label: "Add Trade", icon: <PlusCircle className="h-4 w-4" /> },
     { id: "analytics", label: "Analytics", icon: <BarChart3 className="h-4 w-4" /> },
+    { id: "calendar", label: "Calendar", icon: <Calendar className="h-4 w-4" /> },
   ];
 
   return (
@@ -39,8 +53,16 @@ export default function Index() {
           <h1 className="text-2xl font-extrabold tracking-tight text-foreground">
             FX-LOG<span className="text-primary">.</span>
           </h1>
-          <div className="tabular-nums text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Discipline: {stats.disciplineScore.toFixed(0)}%
+          <div className="flex items-center gap-4">
+            <div className="tabular-nums text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Discipline: {stats.disciplineScore.toFixed(0)}%
+            </div>
+            {trades.length > 0 && (
+              <Button variant="outline" size="sm" onClick={handleExport} className="gap-1.5">
+                <Download className="h-3.5 w-3.5" />
+                Export CSV
+              </Button>
+            )}
           </div>
         </header>
 
@@ -68,7 +90,6 @@ export default function Index() {
         {/* Dashboard */}
         {activeTab === "dashboard" && (
           <div className="animate-fade-in space-y-6">
-            {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
               <StatCard
                 label="Total Profit"
@@ -81,7 +102,6 @@ export default function Index() {
               <StatCard label="Avg R:R" value={stats.avgRR.toFixed(2)} />
             </div>
 
-            {/* Charts */}
             <div className="grid gap-6 lg:grid-cols-3">
               <div className="rounded-lg border border-border bg-card p-5 shadow-sm lg:col-span-2">
                 <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Equity Curve</h3>
@@ -93,7 +113,6 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Recent Trades */}
             <div>
               <h3 className="mb-3 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Recent Trades</h3>
               <TradeHistory trades={trades} onDelete={setTrades} />
@@ -126,7 +145,6 @@ export default function Index() {
               </div>
             </div>
 
-            {/* Pair table */}
             {pairStats.length > 0 && (
               <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
                 <table className="w-full text-sm text-left">
@@ -154,6 +172,11 @@ export default function Index() {
               </div>
             )}
           </div>
+        )}
+
+        {/* Calendar */}
+        {activeTab === "calendar" && (
+          <TradeCalendar trades={trades} />
         )}
       </div>
     </div>

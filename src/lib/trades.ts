@@ -7,6 +7,11 @@ export interface Trade {
   rr: number;
   discipline: "yes" | "no";
   timestamp: number;
+  notes?: string;
+  screenshot?: string;
+  setupGrade?: "A" | "B" | "C";
+  emotion?: "Calm" | "Fear" | "Greed" | "FOMO" | "Revenge";
+  confidence?: number;
 }
 
 const STORAGE_KEY = "fx_trades";
@@ -132,5 +137,34 @@ export function getSessionStats(trades: Trade[]): { session: string; count: numb
   return Object.entries(map).map(([session, data]) => ({ session, ...data }));
 }
 
+export function exportTradesToCSV(trades: Trade[]): string {
+  const headers = ["Date", "Pair", "Session", "P&L", "R:R", "Discipline", "Setup Grade", "Emotion", "Confidence", "Notes"];
+  const rows = trades.map((t) => [
+    t.date,
+    t.pair,
+    t.session,
+    t.pnl.toFixed(2),
+    t.rr.toString(),
+    t.discipline,
+    t.setupGrade || "",
+    t.emotion || "",
+    t.confidence?.toString() || "",
+    `"${(t.notes || "").replace(/"/g, '""')}"`,
+  ].join(","));
+  return [headers.join(","), ...rows].join("\n");
+}
+
+export function getCalendarData(trades: Trade[]): Record<string, { pnl: number; count: number }> {
+  const map: Record<string, { pnl: number; count: number }> = {};
+  trades.forEach((t) => {
+    if (!map[t.date]) map[t.date] = { pnl: 0, count: 0 };
+    map[t.date].pnl += t.pnl;
+    map[t.date].count++;
+  });
+  return map;
+}
+
 export const PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "NZDUSD", "USDCHF", "XAUUSD", "BTCUSD"];
 export const SESSIONS = ["London", "New York", "Asian"];
+export const SETUP_GRADES = ["A", "B", "C"] as const;
+export const EMOTIONS = ["Calm", "Fear", "Greed", "FOMO", "Revenge"] as const;
