@@ -54,6 +54,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
       screenshot,
       setupGrade,
       emotion,
+      closingType,
       confidence,
     });
 
