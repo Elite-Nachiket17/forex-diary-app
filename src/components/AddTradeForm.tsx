@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { format } from "date-fns";
 import { addTrade, PAIRS, SESSIONS, SETUP_GRADES, EMOTIONS, type Trade } from "@/lib/trades";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,7 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { ImagePlus, X } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { ImagePlus, X, CalendarIcon } from "lucide-react";
 
 interface Props {
   onTradeAdded: (trades: Trade[]) => void;
@@ -18,6 +22,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
   const [pnl, setPnl] = useState("");
   const [rr, setRr] = useState("");
   const [discipline, setDiscipline] = useState<"yes" | "no">("yes");
+  const [tradeDate, setTradeDate] = useState<Date>(new Date());
   const [notes, setNotes] = useState("");
   const [screenshot, setScreenshot] = useState<string | undefined>();
   const [setupGrade, setSetupGrade] = useState<"A" | "B" | "C">("A");
@@ -38,7 +43,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
     if (!pnl || !rr) return;
 
     const trades = addTrade({
-      date: new Date().toLocaleDateString(),
+      date: format(tradeDate, "yyyy-MM-dd"),
       pair,
       session,
       pnl: parseFloat(pnl),
@@ -63,6 +68,32 @@ export function AddTradeForm({ onTradeAdded }: Props) {
     <div className="mx-auto max-w-xl animate-fade-in rounded-lg border border-border bg-card p-8 shadow-sm">
       <h2 className="mb-6 text-lg font-bold text-card-foreground">Log New Position</h2>
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Trade Date */}
+        <div className="space-y-2">
+          <Label>Trade Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn("w-full justify-start text-left font-normal")}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(tradeDate, "PPP")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={tradeDate}
+                onSelect={(d) => d && setTradeDate(d)}
+                disabled={(d) => d > new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Pair</Label>
