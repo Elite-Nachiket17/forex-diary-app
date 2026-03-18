@@ -68,6 +68,32 @@ export function AddTradeForm({ onTradeAdded }: Props) {
     <div className="mx-auto max-w-xl animate-fade-in rounded-lg border border-border bg-card p-8 shadow-sm">
       <h2 className="mb-6 text-lg font-bold text-card-foreground">Log New Position</h2>
       <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Trade Date */}
+        <div className="space-y-2">
+          <Label>Trade Date</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn("w-full justify-start text-left font-normal")}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {format(tradeDate, "PPP")}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={tradeDate}
+                onSelect={(d) => d && setTradeDate(d)}
+                disabled={(d) => d > new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Pair</Label>
