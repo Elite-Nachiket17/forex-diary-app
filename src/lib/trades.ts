@@ -139,7 +139,7 @@ export function getSessionStats(trades: Trade[]): { session: string; count: numb
 }
 
 export function exportTradesToCSV(trades: Trade[]): string {
-  const headers = ["Date", "Pair", "Session", "P&L", "R:R", "Discipline", "Setup Grade", "Emotion", "Confidence", "Notes"];
+  const headers = ["Date", "Pair", "Session", "P&L", "R:R", "Discipline", "Setup Grade", "Emotion", "Closing Type", "Confidence", "Notes"];
   const rows = trades.map((t) => [
     t.date,
     t.pair,
@@ -149,6 +149,7 @@ export function exportTradesToCSV(trades: Trade[]): string {
     t.discipline,
     t.setupGrade || "",
     t.emotion || "",
+    t.closingType || "",
     t.confidence?.toString() || "",
     `"${(t.notes || "").replace(/"/g, '""')}"`,
   ].join(","));
