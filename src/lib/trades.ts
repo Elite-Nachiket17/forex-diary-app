@@ -269,3 +269,4 @@ export const PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "NZDUSD"
 export const SESSIONS = ["London", "New York", "Asian"];
 export const SETUP_GRADES = ["A", "B", "C"] as const;
 export const EMOTIONS = ["Calm", "Fear", "Greed", "FOMO", "Revenge"] as const;
+export const CLOSING_TYPES = ["SL", "TP", "Trailing SL", "Manual"] as const;
