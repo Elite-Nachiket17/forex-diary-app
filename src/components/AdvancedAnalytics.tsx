@@ -174,8 +174,8 @@ export function AdvancedAnalytics({ trades, stats }: Props) {
         </div>
       </div>
 
-      {/* Emotion & Grade breakdown tables */}
-      <div className="grid gap-6 lg:grid-cols-2">
+      {/* Emotion, Grade & Closing Type breakdown tables */}
+      <div className="grid gap-6 lg:grid-cols-3">
         <BreakdownTable
           title="Performance by Emotion"
           rows={advanced.emotionStats.map(e => ({ label: e.emotion, count: e.count, winRate: e.winRate, pnl: e.pnl }))}
@@ -183,6 +183,10 @@ export function AdvancedAnalytics({ trades, stats }: Props) {
         <BreakdownTable
           title="Performance by Setup Grade"
           rows={advanced.gradeStats.map(g => ({ label: g.grade, count: g.count, winRate: g.winRate, pnl: g.pnl }))}
+        />
+        <BreakdownTable
+          title="Performance by Closing Type"
+          rows={advanced.closingTypeStats.map(c => ({ label: c.type, count: c.count, winRate: c.winRate, pnl: c.pnl }))}
         />
       </div>
 

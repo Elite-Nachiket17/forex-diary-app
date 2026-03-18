@@ -132,7 +132,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <div className="space-y-2">
             <Label>Setup Quality</Label>
             <Select value={setupGrade} onValueChange={(v: "A" | "B" | "C") => setSetupGrade(v)}>
@@ -153,6 +153,17 @@ export function AddTradeForm({ onTradeAdded }: Props) {
               <SelectContent>
                 {EMOTIONS.map((em) => (
                   <SelectItem key={em} value={em}>{em}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Closing Type</Label>
+            <Select value={closingType} onValueChange={(v: Trade["closingType"]) => setClosingType(v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CLOSING_TYPES.map((ct) => (
+                  <SelectItem key={ct} value={ct}>{ct}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
