@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from "react";
-import { getTrades, calculateStats, getEquityCurve, exportTradesToCSV, saveTrades, type Trade } from "@/lib/trades";
+import { getTrades, calculateStats, getEquityCurve, getSessionStats, exportTradesToCSV, saveTrades, type Trade } from "@/lib/trades";
 import { StatCard } from "@/components/StatCard";
 import { EquityChart } from "@/components/EquityChart";
 import { SessionChart } from "@/components/SessionChart";
