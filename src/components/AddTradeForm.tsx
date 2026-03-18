@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { format } from "date-fns";
-import { addTrade, PAIRS, SESSIONS, SETUP_GRADES, EMOTIONS, type Trade } from "@/lib/trades";
+import { addTrade, PAIRS, SESSIONS, SETUP_GRADES, EMOTIONS, CLOSING_TYPES, type Trade } from "@/lib/trades";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
