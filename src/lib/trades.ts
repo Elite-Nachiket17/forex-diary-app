@@ -12,6 +12,7 @@ export interface Trade {
   setupGrade?: "A" | "B" | "C";
   emotion?: "Calm" | "Fear" | "Greed" | "FOMO" | "Revenge";
   confidence?: number;
+  closingType?: "SL" | "TP" | "Trailing SL" | "Manual";
 }
 
 const STORAGE_KEY = "fx_trades";
