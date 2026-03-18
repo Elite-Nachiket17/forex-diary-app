@@ -22,6 +22,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
   const [pnl, setPnl] = useState("");
   const [rr, setRr] = useState("");
   const [discipline, setDiscipline] = useState<"yes" | "no">("yes");
+  const [tradeDate, setTradeDate] = useState<Date>(new Date());
   const [notes, setNotes] = useState("");
   const [screenshot, setScreenshot] = useState<string | undefined>();
   const [setupGrade, setSetupGrade] = useState<"A" | "B" | "C">("A");
