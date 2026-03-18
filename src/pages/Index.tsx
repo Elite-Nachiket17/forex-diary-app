@@ -171,51 +171,7 @@ export default function Index() {
 
         {/* Analytics */}
         {activeTab === "analytics" && (
-          <div className="animate-fade-in space-y-6">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <StatCard label="Total Trades" value={String(stats.totalTrades)} />
-              <StatCard label="Wins" value={String(stats.wins)} colorClass="text-success" />
-              <StatCard label="Losses" value={String(stats.losses)} colorClass="text-destructive" />
-            </div>
-
-            <div className="grid gap-6 lg:grid-cols-2">
-              <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">P&L by Pair</h3>
-                <PairPerformance data={pairStats} />
-              </div>
-              <div className="rounded-lg border border-border bg-card p-5 shadow-sm">
-                <h3 className="mb-4 text-sm font-semibold text-muted-foreground uppercase tracking-wider">Session Breakdown</h3>
-                <SessionChart data={sessionStats} />
-              </div>
-            </div>
-
-            {pairStats.length > 0 && (
-              <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
-                <table className="w-full text-sm text-left">
-                  <thead>
-                    <tr className="border-b border-border bg-muted">
-                      <th className="px-4 py-3 font-semibold">Pair</th>
-                      <th className="px-4 py-3 font-semibold text-right">Trades</th>
-                      <th className="px-4 py-3 font-semibold text-right">Win Rate</th>
-                      <th className="px-4 py-3 font-semibold text-right">P&L</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {pairStats.map((p) => (
-                      <tr key={p.pair} className="border-b border-border last:border-0">
-                        <td className="px-4 py-3 font-bold">{p.pair}</td>
-                        <td className="px-4 py-3 tabular-nums text-right">{p.trades}</td>
-                        <td className="px-4 py-3 tabular-nums text-right">{p.winRate.toFixed(1)}%</td>
-                        <td className={`px-4 py-3 tabular-nums text-right font-bold ${p.pnl >= 0 ? "text-success" : "text-destructive"}`}>
-                          {p.pnl >= 0 ? "+" : ""}${p.pnl.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+          <AdvancedAnalytics trades={trades} stats={stats} />
         )}
 
         {/* Calendar */}
