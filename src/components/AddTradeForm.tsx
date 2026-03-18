@@ -43,7 +43,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
     if (!pnl || !rr) return;
 
     const trades = addTrade({
-      date: new Date().toLocaleDateString(),
+      date: format(tradeDate, "yyyy-MM-dd"),
       pair,
       session,
       pnl: parseFloat(pnl),
