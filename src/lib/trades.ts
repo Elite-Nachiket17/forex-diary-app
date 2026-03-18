@@ -12,6 +12,7 @@ export interface Trade {
   setupGrade?: "A" | "B" | "C";
   emotion?: "Calm" | "Fear" | "Greed" | "FOMO" | "Revenge";
   confidence?: number;
+  closingType?: "SL" | "TP" | "Trailing SL" | "Manual";
 }
 
 const STORAGE_KEY = "fx_trades";
@@ -138,7 +139,7 @@ export function getSessionStats(trades: Trade[]): { session: string; count: numb
 }
 
 export function exportTradesToCSV(trades: Trade[]): string {
-  const headers = ["Date", "Pair", "Session", "P&L", "R:R", "Discipline", "Setup Grade", "Emotion", "Confidence", "Notes"];
+  const headers = ["Date", "Pair", "Session", "P&L", "R:R", "Discipline", "Setup Grade", "Emotion", "Closing Type", "Confidence", "Notes"];
   const rows = trades.map((t) => [
     t.date,
     t.pair,
@@ -148,6 +149,7 @@ export function exportTradesToCSV(trades: Trade[]): string {
     t.discipline,
     t.setupGrade || "",
     t.emotion || "",
+    t.closingType || "",
     t.confidence?.toString() || "",
     `"${(t.notes || "").replace(/"/g, '""')}"`,
   ].join(","));
@@ -261,6 +263,19 @@ export function getAdvancedStats(trades: Trade[]) {
     emotionStats: Object.entries(emotionStats).map(([emotion, d]) => ({ emotion, ...d, winRate: (d.wins / d.count) * 100 })),
     gradeStats: Object.entries(gradeStats).map(([grade, d]) => ({ grade, ...d, winRate: (d.wins / d.count) * 100 })),
     disciplineBreakdown,
+
+    // Closing type breakdown
+    closingTypeStats: (() => {
+      const ctStats: Record<string, { count: number; pnl: number; wins: number }> = {};
+      trades.forEach(t => {
+        const ct = t.closingType || "Unknown";
+        if (!ctStats[ct]) ctStats[ct] = { count: 0, pnl: 0, wins: 0 };
+        ctStats[ct].count++;
+        ctStats[ct].pnl += t.pnl;
+        if (t.pnl > 0) ctStats[ct].wins++;
+      });
+      return Object.entries(ctStats).map(([type, d]) => ({ type, ...d, winRate: (d.wins / d.count) * 100 }));
+    })(),
   };
 }
 
@@ -268,3 +283,4 @@ export const PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "NZDUSD"
 export const SESSIONS = ["London", "New York", "Asian"];
 export const SETUP_GRADES = ["A", "B", "C"] as const;
 export const EMOTIONS = ["Calm", "Fear", "Greed", "FOMO", "Revenge"] as const;
+export const CLOSING_TYPES = ["SL", "TP", "Trailing SL", "Manual"] as const;

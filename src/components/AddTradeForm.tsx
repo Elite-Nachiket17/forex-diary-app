@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { format } from "date-fns";
-import { addTrade, PAIRS, SESSIONS, SETUP_GRADES, EMOTIONS, type Trade } from "@/lib/trades";
+import { addTrade, PAIRS, SESSIONS, SETUP_GRADES, EMOTIONS, CLOSING_TYPES, type Trade } from "@/lib/trades";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,6 +27,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
   const [screenshot, setScreenshot] = useState<string | undefined>();
   const [setupGrade, setSetupGrade] = useState<"A" | "B" | "C">("A");
   const [emotion, setEmotion] = useState<Trade["emotion"]>("Calm");
+  const [closingType, setClosingType] = useState<Trade["closingType"]>("TP");
   const [confidence, setConfidence] = useState(5);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -53,6 +54,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
       screenshot,
       setupGrade,
       emotion,
+      closingType,
       confidence,
     });
 
@@ -130,7 +132,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
           <div className="space-y-2">
             <Label>Setup Quality</Label>
             <Select value={setupGrade} onValueChange={(v: "A" | "B" | "C") => setSetupGrade(v)}>
@@ -151,6 +153,17 @@ export function AddTradeForm({ onTradeAdded }: Props) {
               <SelectContent>
                 {EMOTIONS.map((em) => (
                   <SelectItem key={em} value={em}>{em}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Closing Type</Label>
+            <Select value={closingType} onValueChange={(v: Trade["closingType"]) => setClosingType(v)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CLOSING_TYPES.map((ct) => (
+                  <SelectItem key={ct} value={ct}>{ct}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
