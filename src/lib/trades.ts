@@ -164,6 +164,106 @@ export function getCalendarData(trades: Trade[]): Record<string, { pnl: number; 
   return map;
 }
 
+export function getAdvancedStats(trades: Trade[]) {
+  if (trades.length === 0) return null;
+
+  // Profit Factor
+  const grossProfit = trades.filter(t => t.pnl > 0).reduce((s, t) => s + t.pnl, 0);
+  const grossLoss = Math.abs(trades.filter(t => t.pnl < 0).reduce((s, t) => s + t.pnl, 0));
+  const profitFactor = grossLoss === 0 ? grossProfit || 0 : grossProfit / grossLoss;
+
+  // Streaks
+  let currentStreak = 0, maxWinStreak = 0, maxLoseStreak = 0, tempWin = 0, tempLose = 0;
+  trades.forEach(t => {
+    if (t.pnl > 0) { tempWin++; tempLose = 0; maxWinStreak = Math.max(maxWinStreak, tempWin); }
+    else { tempLose++; tempWin = 0; maxLoseStreak = Math.max(maxLoseStreak, tempLose); }
+  });
+  const last = trades[trades.length - 1];
+  if (last) {
+    let dir = last.pnl > 0 ? 1 : -1;
+    currentStreak = 0;
+    for (let i = trades.length - 1; i >= 0; i--) {
+      if ((trades[i].pnl > 0 ? 1 : -1) === dir) currentStreak++;
+      else break;
+    }
+    currentStreak *= dir;
+  }
+
+  // Best / Worst day
+  const dailyPnl: Record<string, number> = {};
+  trades.forEach(t => { dailyPnl[t.date] = (dailyPnl[t.date] || 0) + t.pnl; });
+  const dailyEntries = Object.entries(dailyPnl);
+  const bestDay = dailyEntries.reduce((a, b) => b[1] > a[1] ? b : a, ["", -Infinity]);
+  const worstDay = dailyEntries.reduce((a, b) => b[1] < a[1] ? b : a, ["", Infinity]);
+
+  // Avg win / avg loss
+  const wins = trades.filter(t => t.pnl > 0);
+  const losses = trades.filter(t => t.pnl < 0);
+  const avgWin = wins.length ? wins.reduce((s, t) => s + t.pnl, 0) / wins.length : 0;
+  const avgLoss = losses.length ? losses.reduce((s, t) => s + t.pnl, 0) / losses.length : 0;
+
+  // Weekly P&L
+  const weeklyPnl: Record<string, number> = {};
+  trades.forEach(t => {
+    const d = new Date(t.date);
+    const startOfWeek = new Date(d);
+    startOfWeek.setDate(d.getDate() - d.getDay());
+    const key = startOfWeek.toISOString().slice(0, 10);
+    weeklyPnl[key] = (weeklyPnl[key] || 0) + t.pnl;
+  });
+
+  // Monthly P&L
+  const monthlyPnl: Record<string, number> = {};
+  trades.forEach(t => {
+    const key = t.date.slice(0, 7); // YYYY-MM
+    monthlyPnl[key] = (monthlyPnl[key] || 0) + t.pnl;
+  });
+
+  // Emotion breakdown
+  const emotionStats: Record<string, { count: number; pnl: number; wins: number }> = {};
+  trades.forEach(t => {
+    const e = t.emotion || "Unknown";
+    if (!emotionStats[e]) emotionStats[e] = { count: 0, pnl: 0, wins: 0 };
+    emotionStats[e].count++;
+    emotionStats[e].pnl += t.pnl;
+    if (t.pnl > 0) emotionStats[e].wins++;
+  });
+
+  // Setup grade breakdown
+  const gradeStats: Record<string, { count: number; pnl: number; wins: number }> = {};
+  trades.forEach(t => {
+    const g = t.setupGrade || "Ungraded";
+    if (!gradeStats[g]) gradeStats[g] = { count: 0, pnl: 0, wins: 0 };
+    gradeStats[g].count++;
+    gradeStats[g].pnl += t.pnl;
+    if (t.pnl > 0) gradeStats[g].wins++;
+  });
+
+  // Discipline breakdown
+  const discYes = trades.filter(t => t.discipline === "yes");
+  const discNo = trades.filter(t => t.discipline === "no");
+  const disciplineBreakdown = {
+    disciplined: { count: discYes.length, pnl: discYes.reduce((s, t) => s + t.pnl, 0), winRate: discYes.length ? (discYes.filter(t => t.pnl > 0).length / discYes.length) * 100 : 0 },
+    undisciplined: { count: discNo.length, pnl: discNo.reduce((s, t) => s + t.pnl, 0), winRate: discNo.length ? (discNo.filter(t => t.pnl > 0).length / discNo.length) * 100 : 0 },
+  };
+
+  return {
+    profitFactor,
+    maxWinStreak,
+    maxLoseStreak,
+    currentStreak,
+    bestDay: { date: bestDay[0], pnl: bestDay[1] as number },
+    worstDay: { date: worstDay[0], pnl: worstDay[1] as number },
+    avgWin,
+    avgLoss,
+    weeklyPnl: Object.entries(weeklyPnl).map(([week, pnl]) => ({ week, pnl })).sort((a, b) => a.week.localeCompare(b.week)),
+    monthlyPnl: Object.entries(monthlyPnl).map(([month, pnl]) => ({ month, pnl })).sort((a, b) => a.month.localeCompare(b.month)),
+    emotionStats: Object.entries(emotionStats).map(([emotion, d]) => ({ emotion, ...d, winRate: (d.wins / d.count) * 100 })),
+    gradeStats: Object.entries(gradeStats).map(([grade, d]) => ({ grade, ...d, winRate: (d.wins / d.count) * 100 })),
+    disciplineBreakdown,
+  };
+}
+
 export const PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "USDCAD", "NZDUSD", "USDCHF", "XAUUSD", "BTCUSD"];
 export const SESSIONS = ["London", "New York", "Asian"];
 export const SETUP_GRADES = ["A", "B", "C"] as const;
