@@ -3,7 +3,7 @@ import { getTrades, calculateStats, getEquityCurve, exportTradesToCSV, saveTrade
 import { StatCard } from "@/components/StatCard";
 import { EquityChart } from "@/components/EquityChart";
 import { SessionChart } from "@/components/SessionChart";
-import { PairPerformance } from "@/components/PairPerformance";
+import { AdvancedAnalytics } from "@/components/AdvancedAnalytics";
 import { AddTradeForm } from "@/components/AddTradeForm";
 import { TradeHistory } from "@/components/TradeHistory";
 import { TradeCalendar } from "@/components/TradeCalendar";
