@@ -27,6 +27,7 @@ export function AddTradeForm({ onTradeAdded }: Props) {
   const [screenshot, setScreenshot] = useState<string | undefined>();
   const [setupGrade, setSetupGrade] = useState<"A" | "B" | "C">("A");
   const [emotion, setEmotion] = useState<Trade["emotion"]>("Calm");
+  const [closingType, setClosingType] = useState<Trade["closingType"]>("TP");
   const [confidence, setConfidence] = useState(5);
   const fileRef = useRef<HTMLInputElement>(null);
 
