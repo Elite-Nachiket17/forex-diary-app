@@ -21,8 +21,6 @@ export default function Index() {
 
   const stats = calculateStats(trades);
   const equityData = getEquityCurve(trades);
-  const pairStats = getPairStats(trades);
-  const sessionStats = getSessionStats(trades);
 
   const handleTradesUpdate = useCallback((updated: Trade[]) => {
     setTrades(updated);
