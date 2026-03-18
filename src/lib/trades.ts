@@ -262,6 +262,19 @@ export function getAdvancedStats(trades: Trade[]) {
     emotionStats: Object.entries(emotionStats).map(([emotion, d]) => ({ emotion, ...d, winRate: (d.wins / d.count) * 100 })),
     gradeStats: Object.entries(gradeStats).map(([grade, d]) => ({ grade, ...d, winRate: (d.wins / d.count) * 100 })),
     disciplineBreakdown,
+
+    // Closing type breakdown
+    closingTypeStats: (() => {
+      const ctStats: Record<string, { count: number; pnl: number; wins: number }> = {};
+      trades.forEach(t => {
+        const ct = t.closingType || "Unknown";
+        if (!ctStats[ct]) ctStats[ct] = { count: 0, pnl: 0, wins: 0 };
+        ctStats[ct].count++;
+        ctStats[ct].pnl += t.pnl;
+        if (t.pnl > 0) ctStats[ct].wins++;
+      });
+      return Object.entries(ctStats).map(([type, d]) => ({ type, ...d, winRate: (d.wins / d.count) * 100 }));
+    })(),
   };
 }
 
